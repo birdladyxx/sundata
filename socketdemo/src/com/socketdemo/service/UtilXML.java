@@ -208,7 +208,7 @@ public class UtilXML {
 	public static Element childNode(Document doc, String xpath, String attribute, String attributeValue, String childNo) {
 		Element childNode = null;
 		try {
-			Element elem = doc.getRootElement();
+			Element elem = doc.getRootElement();//121321321
 			
 		} catch (Exception e) {
 			e.printStackTrace();
