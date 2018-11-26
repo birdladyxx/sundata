@@ -2,6 +2,8 @@ package com.socketdemo.service;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -208,8 +210,20 @@ public class UtilXML {
 	public static Element childNode(Document doc, String xpath, String attribute, String attributeValue, String childNo) {
 		Element childNode = null;
 		try {
-			Element elem = doc.getRootElement();//121321321
-			
+			Element elem = doc.getRootElement();
+			String[] arg = elemStr(xpath);
+			for (int i = 0; i < arg.length; i++) {
+				elem = elem.getChild(arg[i]);
+			}
+			List<Element> list = new ArrayList<Element>();
+			list = elem.getChildren();
+			for (Element el : list) {
+				if (attributeValue.equals(el.getAttributeValue(attribute))) {
+					el = el.getChild(childNo);
+					childNode = el;
+					break;
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
@@ -240,11 +254,78 @@ public class UtilXML {
 		return elemName;
 	}
 	
+	/**
+	 * 取出此节点
+	 * @param doc
+	 * @param xpath
+	 * @param attribute
+	 * @param attributeValue
+	 * @return
+	 */
+	public static Element childNode(Document doc, String xpath, String attribute, String attributeValue) {
+		Element childNode = null;
+		try {
+			Element elem = doc.getRootElement();
+			String[] arg = elemStr(xpath);
+			for (int i = 0; i < arg.length; i++) {
+				elem = elem.getChild(arg[i]);
+				if (elem.getAttributeValue(attribute).equals(attributeValue)) {
+					childNode = elem;
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return childNode;
+	}
 	
+	/**
+	 * 
+	 * @param doc
+	 * @param xpath
+	 * @param attributeValue
+	 * @return
+	 */
+	public static Element childNode(Document doc, String xpath, String attributeValue) {
+		try {
+			Element elem = doc.getRootElement();
+			String[] arg = elemStr(xpath);
+			for (int i = 0; i < arg.length; i++) {
+				elem = elem.getChild(arg[i]);
+			}
+			List<Element> list = elem.getChildren();
+			for (Element el : list) {
+				if (attributeValue.equals(el.getAttribute("name").getValue())) {
+					return el;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
-	
-	
-	
+	/**
+	 * 返回根点下全部元素
+	 * @param doc
+	 * @param xpath
+	 * @return
+	 */
+	public static List<Element> getElementlList(Document doc, String xpath) {
+		List<Element> list = new ArrayList<Element>();
+		try {
+			Element elem = doc.getRootElement();
+			String[] arg = elemStr(xpath);
+			for (int i = 0; i < arg.length; i++) {
+				elem = elem.getChild(arg[i]);
+			}
+			list = elem.getChildren();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
 	
 	
 	
