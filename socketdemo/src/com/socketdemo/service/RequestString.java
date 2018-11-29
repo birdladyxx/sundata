@@ -7,6 +7,7 @@ import java.util.Map;
 
 
 
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.jdom2.Document;
@@ -161,22 +162,25 @@ public class RequestString {
 	}
 
 	/**
-	 * 
-	 * @param inParam
-	 * @param inType
-	 * @param sysFlag
-	 * @param appFlag
-	 * @param localFalg
+	 * 组装请求报文
+	 * @param inParam 请求报文参数
+	 * @param inType 请求报文交易类型名称
+	 * @param sysFlag 请求头格式配置参数 true：配置 false：不配置
+	 * @param appFlag 请求头格式配置参数 true：配置 false：不配置
+	 * @param localFalg 请求头格式配置参数 true：配置 false：不配置
 	 * @return
 	 */
 	public StringBuffer getInputStr(Map<String, Object> inParam, String inType, Boolean sysFlag, Boolean appFlag, Boolean localFalg) {
-		Element root = new Element("service");
+		Element root = new Element("service");// 根节点
 		Document doc = new Document(root);
+		// 子节点
+		// 组装报文头
 		if (sysFlag) {
 			UtilXML.addContent("sys-header", root);
 			Element elem_sys = new Element("data");
 			elem_sys.setAttribute("name", "SYS_HEAD");
 			UtilXML.addContent(doc, "sys-header", elem_sys);
+			UtilXML.addContent(doc, "sys-header/data", "struct");
 			addHeader(doc, "sys");
 		}
 		if (appFlag) {
@@ -197,8 +201,9 @@ public class RequestString {
 			esb = new SetEsbField(inType);
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println("解析报文体配置文件错误！");
 		}
-		
+		// 组装报文体
 		addBodyElement(bodyElem, inParam, esb.getDataList());
 		String buffer = UtilXML.outputter(doc, UtilXML.ENCODE_UTF8);
 		String lengthStr = String.valueOf(buffer.getBytes().length);
@@ -332,17 +337,16 @@ public class RequestString {
 	/**
 	 * 添加请求报文体
 	 */
-	private static void addBodyElement(Element parentElem, Map inParam, List<DataElement> dataList) {
-		Set set = inParam.entrySet();
-		Iterator ite = set.iterator();
-		String sScale = "";
-		String sType = "";
-		String sLength = "";
+	private static void addBodyElement(Element parentElem, Map<String, Object> inParam, List<DataElement> dataList) {
+		Set<Entry<String, Object>> set = inParam.entrySet();
+		Iterator<Entry<String, Object>> ite = set.iterator();
+		
 		while (ite.hasNext()) {
-			Map.Entry mapEntry = (Map.Entry) ite.next();
+			Entry<String, Object> mapEntry = ite.next();
 			Element elem = new Element("data");
-			elem.setAttribute("name", (String) mapEntry.getKey());
-			parentElem.addContent(elem);
+			String sScale = "";
+			String sType = "";
+			String sLength = "";
 			List<DataElement> currEle = null;
 			for (DataElement ele : dataList) {
 				if (ele.getName().equalsIgnoreCase((String) mapEntry.getKey())) {
@@ -350,9 +354,12 @@ public class RequestString {
 					sType = ele.getType();
 					sLength = String.valueOf(ele.getLength());
 					currEle = ele.getList();
+					break;
 				}
 			}
 			if (sType.equalsIgnoreCase("string") || sType.equalsIgnoreCase("double")) {
+				elem.setAttribute("name", (String) mapEntry.getKey());
+				parentElem.addContent(elem);
 				Element file = new Element("field");
 				file.setAttribute("scale", sScale);
 				file.setAttribute("type", sType.toLowerCase());
@@ -360,12 +367,14 @@ public class RequestString {
 				file.setText(String.valueOf(mapEntry.getValue()));
 				elem.addContent(file);
 			} else if (sType.equalsIgnoreCase("array")) {
+				elem.setAttribute("name", (String) mapEntry.getKey());
+				parentElem.addContent(elem);
 				Element arrayElem = new Element("array");
 				elem.addContent(arrayElem);
-				ArrayList dataList_a = (ArrayList) mapEntry.getValue();
+				ArrayList<Map<String, Object>> dataList_a = (ArrayList<Map<String,Object>>) mapEntry.getValue();
 				if (dataList_a != null && dataList_a.size() > 0) {
 					for(int i=0;i<dataList_a.size();i++){
-						Map dataMap = (Map)dataList_a.get(i);
+						Map<String, Object> dataMap = (Map<String, Object>)dataList_a.get(i);
 						Element	strutElem = new Element("struct");
 						arrayElem.addContent(strutElem);
 						addBodyElement(strutElem,dataMap,currEle);
@@ -378,16 +387,16 @@ public class RequestString {
 	
 	public String getErrMsg(Document doc){
 		Element elem = UtilXML.childNode(doc,"sys-header/data/struct","name","RET","array");
-		List arrayElemList=null;
+		List<Element> arrayElemList=null;
 		if(elem!=null)	arrayElemList = elem.getChildren();
 		else return "";	
 		String retMsgs="";	
 		for (int j = 0; j < arrayElemList.size(); j++) {
-			Element documentStruct = (Element) arrayElemList.get(j);
+			Element documentStruct = arrayElemList.get(j);
 			String retCode="",retMsg="";
-			List subElemList = documentStruct.getChildren();
+			List<Element> subElemList = documentStruct.getChildren();
 			for(int i=0;i<subElemList.size();i++){
-				Element el = (Element) subElemList.get(i);	
+				Element el = subElemList.get(i);	
 				String name=el.getAttribute("name").getValue();
 				if("returncode".equals(name)) {
 					Element em = el.getChild("field");

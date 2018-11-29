@@ -243,8 +243,8 @@ public class UtilXML {
 		while (i > -1) {
 			i = xpath.indexOf("/");
 			if (i != -1) {
-				path = xpath.substring(i + 1, xpath.length());
-				xpath = xpath.substring(0, xpath.length());
+				path = xpath.substring(0, i);
+				xpath = xpath.substring(i + 1, xpath.length());
 			} else {
 				path = xpath.substring(0, xpath.length());
 			}

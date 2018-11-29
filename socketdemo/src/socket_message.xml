@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MESSAGES>
+	<TEST>
+		<name type="string" scale="0" length="10" remark="姓名"/>
+		<age type="string" scale="0" length="10" remark="年龄"/>
+		<marriage type="string" scale="0" length="10" remark="婚姻状况"/>
+		<sex type="string" scale="0" length="10" remark="性别"/>
+		<income type="string" scale="0" length="10" remark="收入"/>
+		<boys type="array" scale="0" length="1" remark="小弟">
+			<name type="string" scale="0" length="10" remark="名字"/>
+			<birthday type="string" scale="0" length="10" remark="出生日期"/>
+			<stuid type="string" scale="0" length="20" remark="学号"/>
+		</boys>
+	</TEST>
+	<TEST_RCV>
+		<returncode type="string" scale="0" length="10" remark="响应码"/>
+		<returnmsg type="string" scale="0" length="10" remark="响应信息"/>
+		<score type="string" scale="0" length="10" remark="分数"/>
+	</TEST_RCV>
+</MESSAGES>

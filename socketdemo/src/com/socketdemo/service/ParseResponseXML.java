@@ -49,10 +49,10 @@ public class ParseResponseXML {
 		SAXBuilder sb = new SAXBuilder();
 		Document doc = null;
 		try {
-			doc = sb.build(this.getClass().getClassLoader().getResource("ql_response.xml").getPath());
+			doc = sb.build(this.getClass().getClassLoader().getResource("socket_message.xml").getPath());
 		} catch (JDOMException e) {
 			e.printStackTrace();
-			throw new Exception("解析ql_response.xml文件时出错！");
+			throw new Exception("解析socket_message.xml文件时出错！");
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new Exception("解析配置文件时出错！");
@@ -71,13 +71,14 @@ public class ParseResponseXML {
 			dataList = new ArrayList<DataElement>();
 			for (int i = 0; i < listChild.size(); i++) {
 				ele = listChild.get(i);
+				// 获取配置文件中的配置值
 				dataElement = new DataElement(ele.getName(), ele.getAttributeValue("type"), ele.getAttributeValue("scale"), Integer.parseInt(ele.getAttributeValue("length")), ele.getAttributeValue("remark"));
 				List<DataElement> arList = new ArrayList<DataElement>();
 				if (ele.getAttributeValue("type").equalsIgnoreCase("array")) {
 					List<Element> listChild2 = ele.getChildren();
 					for (int j = 0; j < listChild2.size(); j++) {
-						ele = listChild2.get(i);
-						DataElement dataElement2 = new DataElement(ele.getName(), ele.getAttributeValue("type"), ele.getAttributeValue("sacle"), Integer.parseInt(ele.getAttributeValue("length")), ele.getAttributeValue("remark"));
+						ele = listChild2.get(j);
+						DataElement dataElement2 = new DataElement(ele.getName(), ele.getAttributeValue("type"), ele.getAttributeValue("scale"), Integer.parseInt(ele.getAttributeValue("length")), ele.getAttributeValue("remark"));
 						arList.add(dataElement2);
 					}
 				}
